@@ -27,7 +27,7 @@ public class SMSHandler
         var smsClientPool = new SMSClientPool(smsConfig, limit);
 
         var phoneNumbers = config.GetSection("target-phone-numbers").Get<string[]>()!;
-        if (phoneNumbers == null || phoneNumbers!.Length == 0) throw new Exception("No target phone numbers attached at appsettings.json");
+        if (phoneNumbers == null) throw new Exception("No target phone numbers attached at appsettings.json");
         List<SMSObserver> observers = new();
         foreach (var number in phoneNumbers)
         {

@@ -22,6 +22,7 @@ public class EventHandler
     {
         while (!token.IsCancellationRequested)
         {
+            //Console.WriteLine("1000");
             AssetInfo? info = DataHttpClient.GetAssetInfo(input.assetName).Result;
             handleAssetInfo(info);
             await Task.Delay(requestDelayMilliSec, token);

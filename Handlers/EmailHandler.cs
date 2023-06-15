@@ -29,7 +29,7 @@ public class EmailHandler
         var emailClientPool = new EmailClientPool(smtpConfig, limit);
 
         var emails = config.GetSection("target-emails").Get<string[]>()!;
-        if (emails == null || emails!.Length == 0) throw new Exception("No target e-mails attached at appsettings.json");
+        if (emails == null) throw new Exception("No target e-mails attached at appsettings.json");
         List<EmailObserver> observers = new();
         foreach (var email in emails!)
         {
