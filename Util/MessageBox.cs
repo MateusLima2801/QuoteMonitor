@@ -1,16 +1,19 @@
 using System.Net.Mail;
+using System.Globalization;
 namespace QuoteMonitor;
 
-public static class MailBox
+public static class MessageBox
 {
-    static MailMessage message = new MailMessage
+
+    public static MailMessage GetMailMessage(AlertMessage alert, MailAddress address)
     {
-        From = new MailAddress("mateus.l.silveira@gmail.com"),
-        Subject = "QUOTE MONITOR ALERT",
-        IsBodyHtml = true
-    };
-    public static MailMessage GetMailMessage(AlertMessage alert)
-    {
+        MailMessage message = new MailMessage
+        {
+            From = address,
+            Subject = "QUOTE MONITOR ALERT",
+            IsBodyHtml = true
+        };
+
         string action = alert.priceState == ePriceState.maxOverflow ? "SELLING" : "BUYING";
         string referenceTime = Util.FromTimestampToDate(alert.info.referenceTimestamp);
         string requestTime = Util.FromTimestampToDate(alert.info.requestTimestamp);
@@ -28,7 +31,7 @@ public static class MailBox
                 margin-top: 20px; "">START {action} {alert.info.assetName}</h2>
             <p style=""color: #555;
                 font-size: 18px;
-                margin-bottom: 20px;""> Price: {alert.info.marketPrice} BRL</p>
+                margin-bottom: 20px;""> Price: {alert.info.marketPrice.ToString(CultureInfo.InvariantCulture)} BRL</p>
             <p style=""color: #555;
                 font-size: 16px;
                 margin-bottom: 0.5em;
@@ -41,6 +44,24 @@ public static class MailBox
         </body>
         </html>";
         message.Body = html;
+
+        return message;
+    }
+
+    public static string GetSMSMessage(AlertMessage alert)
+    {
+        string action = alert.priceState == ePriceState.maxOverflow ? "SELLING" : "BUYING";
+        string referenceTime = Util.FromTimestampToDate(alert.info.referenceTimestamp);
+        string requestTime = Util.FromTimestampToDate(alert.info.requestTimestamp);
+
+        string message = $"QUOTE MONITOR REPORT\n\n" +
+                         $"START {action} {alert.info.assetName}\n\n" +
+                         $"Price: {alert.info.marketPrice.ToString(CultureInfo.InvariantCulture)} BRL\n\n" +
+                         $"Reference Time:\n" +
+                         $"{referenceTime}\n\n" +
+                         $"Request Time:\n" +
+                         $"{requestTime}\n\n";
+
 
         return message;
     }

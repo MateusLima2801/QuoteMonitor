@@ -7,11 +7,15 @@ class Program
 {
     static MonitorInput? input;
     static int poolEmailClientLimit = 5;
+    static int poolSMSClientLimit = 5;
     static Subject alertSubject = new();
     static SmtpConfig? smtpConfig;
+    static SMSConfig? smsConfig;
     static string[] emails = Array.Empty<string>();
+    static string[] phoneNumbers = Array.Empty<string>();
     static CancellationTokenSource source = new();
-    static EmailClientPool? emailClientPool;
+    static EmailClientPool? emailClientPool = null;
+    static SMSClientPool? smsClientPool = null;
     public static async Task Main(string[] args)
     {
         try
@@ -26,6 +30,9 @@ class Program
 
             Console.ReadKey();
             source.Cancel();
+
+            if (smsClientPool != null) smsClientPool!.Dispose();
+            if (emailClientPool != null) emailClientPool!.Dispose();
         }
         catch (Exception e)
         {
@@ -40,16 +47,35 @@ class Program
         var builder = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json");
         var config = builder.Build();
 
-        smtpConfig = new(config["smtp:host"]!, int.Parse(config["smtp:port"]!), config["smtp:username"]!, config["smtp:password"]!);
+        SetEmailConfig(config);
+        SetSMSConfig(config);
+    }
+
+    public static void SetEmailConfig(IConfigurationRoot config)
+    {
+        smtpConfig = new(config["email:smtp:host"]!, int.Parse(config["email:smtp:port"]!), config["email:smtp:username"]!, config["email:smtp:password"]!);
         emailClientPool = new(smtpConfig, poolEmailClientLimit);
 
-        emails = config.GetSection("target-emails").Get<string[]>()!;
+        emails = config.GetSection("email:target-emails").Get<string[]>()!;
         if (emails == null || emails!.Length == 0) throw new Exception("No target e-mails attached at appsettings.json");
         foreach (var email in emails!)
         {
-            EmailObserver obs = new EmailObserver(email, emailClientPool);
+            EmailObserver obs = new(email, emailClientPool);
             alertSubject.Attach(obs);
         }
+    }
 
+    public static void SetSMSConfig(IConfigurationRoot config)
+    {
+        smsConfig = new(config["sms:api:api-key"]!, config["sms:api:api-secret"]!);
+        smsClientPool = new(smsConfig, poolSMSClientLimit);
+
+        phoneNumbers = config.GetSection("sms:target-phone-numbers").Get<string[]>()!;
+        if (phoneNumbers == null || phoneNumbers!.Length == 0) throw new Exception("No target phone numbers attached at appsettings.json");
+        foreach (var number in phoneNumbers)
+        {
+            SMSObserver obs = new(number, smsClientPool);
+            alertSubject.Attach(obs);
+        }
     }
 }

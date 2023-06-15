@@ -53,6 +53,10 @@
             "Microsoft.Extensions.Logging": {
               "target": "Package",
               "version": "[7.0.0, )"
+            },
+            "Vonage": {
+              "target": "Package",
+              "version": "[6.4.0, )"
             }
           },
           "imports": [

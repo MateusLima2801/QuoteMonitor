@@ -1,3 +1,4 @@
+using System.Globalization;
 namespace QuoteMonitor;
 
 public class MonitorInput
@@ -31,7 +32,8 @@ public class MonitorInput
         tuple.Item1 = input[0].ToUpper();
         if (checkAssetAvailability(tuple.Item1).Result == false) throw new Exception("Not available asset.");
 
-        if (!double.TryParse(input[1], out tuple.Item2) || !double.TryParse(input[2], out tuple.Item3))
+        if (!double.TryParse(input[1], NumberStyles.Float, CultureInfo.InvariantCulture, out tuple.Item2) ||
+            !double.TryParse(input[2], NumberStyles.Float, CultureInfo.InvariantCulture, out tuple.Item3))
         {
             throw new ArgumentException("Invalid limits at input.");
         }

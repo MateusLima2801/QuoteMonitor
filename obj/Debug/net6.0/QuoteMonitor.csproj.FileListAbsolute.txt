@@ -31,3 +31,15 @@ C:\Users\Mateus\Desktop\QuoteMonitor\bin\Debug\net6.0\Microsoft.Extensions.Loggi
 C:\Users\Mateus\Desktop\QuoteMonitor\bin\Debug\net6.0\Microsoft.Extensions.Logging.Abstractions.dll
 C:\Users\Mateus\Desktop\QuoteMonitor\bin\Debug\net6.0\Microsoft.Extensions.Options.dll
 C:\Users\Mateus\Desktop\QuoteMonitor\bin\Debug\net6.0\Microsoft.Extensions.Configuration.Binder.dll
+C:\Users\Mateus\Desktop\QuoteMonitor\bin\Debug\net6.0\Enums.NET.dll
+C:\Users\Mateus\Desktop\QuoteMonitor\bin\Debug\net6.0\ColorTranslations.dll
+C:\Users\Mateus\Desktop\QuoteMonitor\bin\Debug\net6.0\jose-jwt.dll
+C:\Users\Mateus\Desktop\QuoteMonitor\bin\Debug\net6.0\Microsoft.AspNetCore.WebUtilities.dll
+C:\Users\Mateus\Desktop\QuoteMonitor\bin\Debug\net6.0\Microsoft.Net.Http.Headers.dll
+C:\Users\Mateus\Desktop\QuoteMonitor\bin\Debug\net6.0\Newtonsoft.Json.dll
+C:\Users\Mateus\Desktop\QuoteMonitor\bin\Debug\net6.0\System.IO.Abstractions.dll
+C:\Users\Mateus\Desktop\QuoteMonitor\bin\Debug\net6.0\TestableIO.System.IO.Abstractions.dll
+C:\Users\Mateus\Desktop\QuoteMonitor\bin\Debug\net6.0\TestableIO.System.IO.Abstractions.Wrappers.dll
+C:\Users\Mateus\Desktop\QuoteMonitor\bin\Debug\net6.0\Vonage.Common.dll
+C:\Users\Mateus\Desktop\QuoteMonitor\bin\Debug\net6.0\Vonage.dll
+C:\Users\Mateus\Desktop\QuoteMonitor\bin\Debug\net6.0\Yoh.Text.Json.NamingPolicies.dll
