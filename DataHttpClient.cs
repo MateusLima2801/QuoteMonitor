@@ -23,17 +23,18 @@ public static class DataHttpClient
     {
         JsonElement stocks = root.GetProperty("stocks");
         var allAssets = JsonSerializer.Deserialize<List<string>>(stocks);
-        return allAssets;
+        return allAssets!;
     }
     private static AssetInfo ParseAssetInfo(JsonElement root)
     {
-        string assetName = root.GetProperty("results")[0].GetProperty("symbol").GetString();
-        double marketPrice = root.GetProperty("results")[0].GetProperty("regularMarketPrice").GetDouble();
-        string requestTime = root.GetProperty("requestedAt").GetString();
-        long requestTimestamp = Util.FromDateToTimestamp(requestTime);
-        string referenceTime = root.GetProperty("results")[0].GetProperty("regularMarketTime").GetString();
-        long referenceTimestamp = Util.FromDateToTimestamp(referenceTime);
-        AssetInfo info = new AssetInfo(assetName, marketPrice, referenceTimestamp, requestTimestamp);
+        AssetInfo? info = null;
+        string? assetName = root.GetProperty("results")[0].GetProperty("symbol").GetString();
+        double? marketPrice = root.GetProperty("results")[0].GetProperty("regularMarketPrice").GetDouble();
+        string? requestTime = root.GetProperty("requestedAt").GetString();
+        long? requestTimestamp = Util.FromDateToTimestamp(requestTime!);
+        string? referenceTime = root.GetProperty("results")[0].GetProperty("regularMarketTime").GetString();
+        long? referenceTimestamp = Util.FromDateToTimestamp(referenceTime!);
+        info = new AssetInfo(assetName!, (double)marketPrice, (long)referenceTimestamp, (long)requestTimestamp);
         return info;
     }
 

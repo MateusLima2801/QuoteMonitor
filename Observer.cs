@@ -64,7 +64,7 @@ public class EmailObserver : IObserver
 
     void PrintMsg()
     {
-        Console.WriteLine("Observador numero: " + number + " recebendo mensagem --- " + receivedMsg.priceState);
+        Console.WriteLine("Observador numero: " + number + " recebendo mensagem --- " + receivedMsg!.priceState);
     }
 
     void SendEmail()
