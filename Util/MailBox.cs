@@ -41,7 +41,8 @@ public static class MailBox
         </head>
         <body>
             <h1>QUOTE MONITOR REPORT</h1>
-            <p>START {action} {alert.info.assetName}</p>
+            <h2>START {action} {alert.info.assetName}</h2>
+            <p> Price: {alert.info.marketPrice} BRL</p>
             <p>Reference Time: {referenceTime}</p>
             <p>Request Time: {requestTime}</p>
         </body>

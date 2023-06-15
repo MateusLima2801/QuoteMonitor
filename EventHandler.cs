@@ -8,24 +8,27 @@ public class EventHandler
     MonitorInput input;
     Subject subject;
     ePriceState state = ePriceState.insideLimits;
+    CancellationToken token;
 
-    public EventHandler(MonitorInput Input, Subject Subject, int RequestDelayMilliSec = 0)
+    public EventHandler(MonitorInput Input, Subject Subject, CancellationToken Token, int RequestDelayMilliSec = 0)
     {
         requestDelayMilliSec = RequestDelayMilliSec <= DataHttpClient.minDelayMilliSeconds
                                ? DataHttpClient.minDelayMilliSeconds
                                : RequestDelayMilliSec;
         input = Input;
         subject = Subject;
+        token = Token;
     }
 
-    public void Start()
+    public async Task Start()
     {
+        Console.WriteLine("Press any key to stop the loop.\n");
         //cut that
-        while (!Console.KeyAvailable || Console.ReadKey(true).Key != ConsoleKey.Enter)
+        while (!token.IsCancellationRequested)
         {
             AssetInfo? info = DataHttpClient.GetAssetInfo(input.assetName).Result;
             handleAssetInfo(info);
-            Thread.Sleep(requestDelayMilliSec);
+            await Task.Delay(requestDelayMilliSec, token);
         }
     }
 

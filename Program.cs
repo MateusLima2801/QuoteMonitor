@@ -7,9 +7,9 @@ class Program
 {
     public static MonitorInput? input;
     public static SmtpClient? smtpClient;
-    public static Subject? alertSubject;
+    public static Subject alertSubject = new();
     public static string[]? emails;
-
+    public static CancellationTokenSource source = new();
     public static async Task Main(string[] args)
     {
         try
@@ -26,7 +26,6 @@ class Program
                 EnableSsl = true,
             };
 
-            alertSubject = new Subject();
             emails = config.GetSection("target-emails").Get<string[]>();//config.GetSection("target-emails").Get<string[]>();
 
             if (emails == null || emails!.Length == 0) throw new Exception("No target e-mails attached at appsettings.json");
@@ -37,10 +36,14 @@ class Program
             }
 
             // alertSubject.CreateMsg(new AlertMessage(ePriceState.maxOverflow, input.assetName));
-            EventHandler handler = new EventHandler(input, alertSubject, 3600000);
-            Console.WriteLine("Press ENTER to stop the loop.");
-            handler.Start();
+            EventHandler handler = new EventHandler(input, alertSubject, source.Token/*, 3600000*/);
+            await Task.Factory.StartNew(handler.Start, TaskCreationOptions.LongRunning);
+
+            Console.ReadKey();
+
+            source.Cancel();
         }
+        //catch (TaskCanceledException) { }
         catch (Exception e)
         {
             Console.WriteLine("Error:" + e.Message);
