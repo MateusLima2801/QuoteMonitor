@@ -1,28 +1,19 @@
 ﻿using Microsoft.Extensions.Configuration;
-using System.Net.Mail;
-using System.Net;
 namespace QuoteMonitor;
 
 class Program
 {
     static MonitorInput? input;
-    static int poolEmailClientLimit = 5;
-    static int poolSMSClientLimit = 5;
+    static EmailHandler? emailHandler = null;
+    static SMSHandler? smsHandler = null;
     static Subject alertSubject = new();
-    static SmtpConfig? smtpConfig;
-    static SMSConfig? smsConfig;
-    static string[] emails = Array.Empty<string>();
-    static string[] phoneNumbers = Array.Empty<string>();
     static CancellationTokenSource source = new();
-    static EmailClientPool? emailClientPool = null;
-    static SMSClientPool? smsClientPool = null;
+
     public static async Task Main(string[] args)
     {
         try
         {
             SetConfiguration(args);
-
-
             Console.WriteLine("Press any key to stop monitoring...");
             // alertSubject.CreateMsg(new AlertMessage(ePriceState.maxOverflow, input.assetName));
             EventHandler handler = new EventHandler(input!, alertSubject, source.Token, 1000);
@@ -31,8 +22,8 @@ class Program
             Console.ReadKey();
             source.Cancel();
 
-            if (smsClientPool != null) smsClientPool!.Dispose();
-            if (emailClientPool != null) emailClientPool!.Dispose();
+            if (smsHandler != null) smsHandler!.Dispose();
+            if (emailHandler != null) emailHandler!.Dispose();
         }
         catch (Exception e)
         {
@@ -47,35 +38,12 @@ class Program
         var builder = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json");
         var config = builder.Build();
 
-        SetEmailConfig(config);
-        SetSMSConfig(config);
+        emailHandler = EmailHandler.SetEmailConfig(config.GetSection("emails"));
+        alertSubject.Attach(emailHandler.observers.ToArray());
+
+        smsHandler = SMSHandler.SetSMSConfig(config.GetSection("sms"));
+        alertSubject.Attach(smsHandler.observers.ToArray());
     }
 
-    public static void SetEmailConfig(IConfigurationRoot config)
-    {
-        smtpConfig = new(config["email:smtp:host"]!, int.Parse(config["email:smtp:port"]!), config["email:smtp:username"]!, config["email:smtp:password"]!);
-        emailClientPool = new(smtpConfig, poolEmailClientLimit);
 
-        emails = config.GetSection("email:target-emails").Get<string[]>()!;
-        if (emails == null || emails!.Length == 0) throw new Exception("No target e-mails attached at appsettings.json");
-        foreach (var email in emails!)
-        {
-            EmailObserver obs = new(email, emailClientPool);
-            alertSubject.Attach(obs);
-        }
-    }
-
-    public static void SetSMSConfig(IConfigurationRoot config)
-    {
-        smsConfig = new(config["sms:api:api-key"]!, config["sms:api:api-secret"]!);
-        smsClientPool = new(smsConfig, poolSMSClientLimit);
-
-        phoneNumbers = config.GetSection("sms:target-phone-numbers").Get<string[]>()!;
-        if (phoneNumbers == null || phoneNumbers!.Length == 0) throw new Exception("No target phone numbers attached at appsettings.json");
-        foreach (var number in phoneNumbers)
-        {
-            SMSObserver obs = new(number, smsClientPool);
-            alertSubject.Attach(obs);
-        }
-    }
 }

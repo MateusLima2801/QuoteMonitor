@@ -4,6 +4,7 @@ public class SMSObserver : IObserver
 {
     SMSClientPool clientPool;
     string? phoneNumber;
+    BalanceInfo balanceInfo;
 
     public SMSObserver(string PhoneNumber, SMSClientPool ClientPool) : base()
     {

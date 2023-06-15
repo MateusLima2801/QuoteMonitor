@@ -25,7 +25,7 @@ public class SMSClient
         vonageClient = new VonageClient(credentials);
     }
 
-    public void SendSMS(string SMSMessage, string recipientPhoneNumber, string senderName = "QUOTE MONITOR ALERT")
+    public void SendSMS(string SMSMessage, string recipientPhoneNumber, string senderName = "QUOTE MONITOR REPORT")
     {
         var response = vonageClient.SmsClient.SendAnSms(new Vonage.Messaging.SendSmsRequest()
         {
@@ -33,6 +33,7 @@ public class SMSClient
             From = senderName,
             Text = SMSMessage
         });
+
     }
 
     public void Dispose()

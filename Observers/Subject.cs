@@ -1,4 +1,3 @@
-
 namespace QuoteMonitor;
 
 public class Subject
