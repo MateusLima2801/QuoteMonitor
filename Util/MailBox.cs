@@ -14,37 +14,30 @@ public static class MailBox
         string action = alert.priceState == ePriceState.maxOverflow ? "SELLING" : "BUYING";
         string referenceTime = Util.FromTimestampToDate(alert.info.referenceTimestamp);
         string requestTime = Util.FromTimestampToDate(alert.info.requestTimestamp);
-        string css = @"
-        <style>
-            body {
-                background-color: #f5f5f5;
-                font-family: Arial, sans-serif;
-                text-align: center;
-            }
-            h1 {
-                color: #333;
-                font-size: 24px;
-                margin-top: 40px;
-            }
-            p {
-                color: #555;
-                font-size: 18px;
-                margin-bottom: 20px;
-            }
-        </style>
-    ";
 
         string html = $@"
         <html>
-        <head>
-            {css}
-        </head>
         <body>
-            <h1>QUOTE MONITOR REPORT</h1>
-            <h2>START {action} {alert.info.assetName}</h2>
-            <p> Price: {alert.info.marketPrice} BRL</p>
-            <p>Reference Time: {referenceTime}</p>
-            <p>Request Time: {requestTime}</p>
+             <span style=""
+                font-family: Arial, sans-serif;
+                text-align: center;"">
+            <h1 style=""color: #333;
+                font-size: 24px;
+                margin-top: 40px;"">QUOTE MONITOR REPORT</h1>
+            <h2 style=""color: #333;
+                margin-top: 20px; "">START {action} {alert.info.assetName}</h2>
+            <p style=""color: #555;
+                font-size: 18px;
+                margin-bottom: 20px;""> Price: {alert.info.marketPrice} BRL</p>
+            <p style=""color: #555;
+                font-size: 16px;
+                margin-bottom: 0.5em;
+                font-weight: light"">Reference Time: {referenceTime}</p>
+            <p styles=""color: #555;
+                font-size: 16px;
+                margin-bottom: 0.5em;
+                font-weight: light"">Request Time: {requestTime}</p>
+            </span>
         </body>
         </html>";
         message.Body = html;

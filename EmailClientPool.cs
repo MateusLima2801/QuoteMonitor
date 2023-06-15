@@ -11,7 +11,7 @@ public class EmailClientPool : IDisposable
     private SemaphoreSlim semaphore;
     public EmailClientPool(SmtpConfig config, int poolSize)
     {
-        emailClientPool = new BlockingCollection<EmailClient>(poolSize);
+        emailClientPool = new BlockingCollection<EmailClient>();
         semaphore = new SemaphoreSlim(poolSize);
 
         // Create and populate the pool with SmtpClient instances

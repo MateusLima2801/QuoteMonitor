@@ -30,16 +30,16 @@ public class Subject
 
     private void Notify()
     {
-        foreach (var obs in EmailObservers)
+        Parallel.ForEach(EmailObservers, obs =>
         {
             obs.Update(_alert!);
-        }
+        });
     }
 
     public void CreateMsg(AlertMessage alert)
     {
         _alert = alert;
-        Console.WriteLine("Subject: mudei meu estado --- notificando observadores...");
+        //Console.WriteLine("Subject: mudei meu estado --- notificando observadores...");
         Notify();
     }
 };
@@ -79,7 +79,7 @@ public class EmailObserver : IObserver
     public override void Update(AlertMessage alert)
     {
         receivedMsg = alert;
-        PrintMsg();
+        //PrintMsg();
         SendEmail();
     }
 };

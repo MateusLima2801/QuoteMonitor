@@ -5,13 +5,13 @@ namespace QuoteMonitor;
 
 class Program
 {
-    public static MonitorInput? input;
-    // public static SmtpClient? smtpClient;
-    public static Subject alertSubject = new();
-    public static SmtpConfig? smtpConfig;
-    public static string[] emails = Array.Empty<string>();
-    public static CancellationTokenSource source = new();
-    public static EmailClientPool? emailClientPool;
+    static MonitorInput? input;
+    static int poolEmailClientLimit = 5;
+    static Subject alertSubject = new();
+    static SmtpConfig? smtpConfig;
+    static string[] emails = Array.Empty<string>();
+    static CancellationTokenSource source = new();
+    static EmailClientPool? emailClientPool;
     public static async Task Main(string[] args)
     {
         try
@@ -41,7 +41,7 @@ class Program
         var config = builder.Build();
 
         smtpConfig = new(config["smtp:host"]!, int.Parse(config["smtp:port"]!), config["smtp:username"]!, config["smtp:password"]!);
-        emailClientPool = new(smtpConfig, 2);
+        emailClientPool = new(smtpConfig, poolEmailClientLimit);
 
         emails = config.GetSection("target-emails").Get<string[]>()!;
         if (emails == null || emails!.Length == 0) throw new Exception("No target e-mails attached at appsettings.json");
