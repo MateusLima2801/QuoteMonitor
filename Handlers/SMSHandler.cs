@@ -21,7 +21,9 @@ public class SMSHandler
 
     public static SMSHandler SetSMSConfig(IConfigurationSection config, int limit = 5)
     {
-        var smsConfig = new SMSConfig(config["api:api-key"]!, config["api:api-secret"]!);
+        var apiKey = config.GetSection("api:api-key").Get<string>();
+        var apiSecret = config.GetSection("api:api-secret").Get<string>();
+        var smsConfig = new SMSConfig(apiKey!, apiSecret!);
         var smsClientPool = new SMSClientPool(smsConfig, limit);
 
         var phoneNumbers = config.GetSection("target-phone-numbers").Get<string[]>()!;

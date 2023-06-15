@@ -21,7 +21,11 @@ public class EmailHandler
 
     public static EmailHandler SetEmailConfig(IConfigurationSection config, int limit = 5)
     {
-        var smtpConfig = new SmtpConfig(config["smtp:host"]!, int.Parse(config["smtp:port"]!), config["smtp:username"]!, config["smtp:password"]!);
+        var host = config.GetSection("smtp:host").Get<string>();
+        var port = config.GetSection("smtp:port").Get<int>();
+        var username = config.GetSection("smtp:username").Get<string>();
+        var password = config.GetSection("smtp:password").Get<string>();
+        var smtpConfig = new SmtpConfig(host!, port, username!, password!);
         var emailClientPool = new EmailClientPool(smtpConfig, limit);
 
         var emails = config.GetSection("target-emails").Get<string[]>()!;

@@ -27,7 +27,7 @@ class Program
         }
         catch (Exception e)
         {
-            Console.WriteLine("Error:" + e.Message);
+            Console.WriteLine("Error: " + e);
         }
     }
 
@@ -38,7 +38,7 @@ class Program
         var builder = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json");
         var config = builder.Build();
 
-        emailHandler = EmailHandler.SetEmailConfig(config.GetSection("emails"));
+        emailHandler = EmailHandler.SetEmailConfig(config.GetSection("email"));
         alertSubject.Attach(emailHandler.observers.ToArray());
 
         smsHandler = SMSHandler.SetSMSConfig(config.GetSection("sms"));
