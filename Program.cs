@@ -6,47 +6,50 @@ namespace QuoteMonitor;
 class Program
 {
     public static MonitorInput? input;
-    public static SmtpClient? smtpClient;
+    // public static SmtpClient? smtpClient;
     public static Subject alertSubject = new();
-    public static string[]? emails;
+    public static SmtpConfig? smtpConfig;
+    public static string[] emails = Array.Empty<string>();
     public static CancellationTokenSource source = new();
+    public static EmailClientPool? emailClientPool;
     public static async Task Main(string[] args)
     {
         try
         {
-            input = MonitorInput.handleInput(args);
+            SetConfiguration(args);
 
-            var builder = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json");
-            var config = builder.Build();
 
-            smtpClient = new SmtpClient(config["smtp:host"])
-            {
-                Port = int.Parse(config["smtp:port"]!),
-                Credentials = new NetworkCredential(config["smtp:username"], config["smtp:password"]),
-                EnableSsl = true,
-            };
-
-            emails = config.GetSection("target-emails").Get<string[]>();//config.GetSection("target-emails").Get<string[]>();
-
-            if (emails == null || emails!.Length == 0) throw new Exception("No target e-mails attached at appsettings.json");
-            foreach (var email in emails!)
-            {
-                EmailObserver obs = new EmailObserver(email, smtpClient);
-                alertSubject.Attach(obs);
-            }
-
+            Console.WriteLine("Press any key to stop monitoring...");
             // alertSubject.CreateMsg(new AlertMessage(ePriceState.maxOverflow, input.assetName));
-            EventHandler handler = new EventHandler(input, alertSubject, source.Token/*, 3600000*/);
-            await Task.Factory.StartNew(handler.Start, TaskCreationOptions.LongRunning);
+            EventHandler handler = new EventHandler(input!, alertSubject, source.Token, 1000);
+            await Task.Factory.StartNew(handler.Start, source.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
 
             Console.ReadKey();
-
             source.Cancel();
         }
-        //catch (TaskCanceledException) { }
         catch (Exception e)
         {
             Console.WriteLine("Error:" + e.Message);
         }
+    }
+
+    public static void SetConfiguration(string[] args)
+    {
+        input = MonitorInput.handleInput(args);
+
+        var builder = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json");
+        var config = builder.Build();
+
+        smtpConfig = new(config["smtp:host"]!, int.Parse(config["smtp:port"]!), config["smtp:username"]!, config["smtp:password"]!);
+        emailClientPool = new(smtpConfig, 2);
+
+        emails = config.GetSection("target-emails").Get<string[]>()!;
+        if (emails == null || emails!.Length == 0) throw new Exception("No target e-mails attached at appsettings.json");
+        foreach (var email in emails!)
+        {
+            EmailObserver obs = new EmailObserver(email, emailClientPool);
+            alertSubject.Attach(obs);
+        }
+
     }
 }

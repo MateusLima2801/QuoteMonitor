@@ -47,16 +47,17 @@ public class Subject
 
 public class EmailObserver : IObserver
 {
-    private EmailClientSingleton emailClient;
+
+    private EmailClientPool clientPool;
     AlertMessage? receivedMsg;
     string? email;
     int? number;
 
     protected static int s_id = 1;
 
-    public EmailObserver(string Email, SmtpClient client)
+    public EmailObserver(string Email, EmailClientPool ClientPool)
     {
-        emailClient = EmailClientSingleton.GetInstance(client);
+        clientPool = ClientPool;
         number = EmailObserver.s_id;
         EmailObserver.s_id++;
         email = Email;
@@ -67,40 +68,20 @@ public class EmailObserver : IObserver
         Console.WriteLine("Observador numero: " + number + " recebendo mensagem --- " + receivedMsg!.priceState);
     }
 
-    void SendEmail()
+    async void SendEmail()
     {
+        var emailClient = await clientPool.GetClient();
         var msg = MailBox.GetMailMessage(receivedMsg!);
         emailClient.SendEmail(msg, email!);
+        clientPool.ReturnClient(emailClient);
     }
 
     public override void Update(AlertMessage alert)
     {
         receivedMsg = alert;
         PrintMsg();
-        //SendEmail();
+        SendEmail();
     }
 };
 
-
-//UNITY TEST FOR EmailObserver
-// Subject sub = new();
-
-// // criando ObservadoresConcretos
-// EmailObserver obs1 = new();
-// EmailObserver obs2 = new();
-// EmailObserver obs3 = new();
-// sub.attach(obs1, obs3);
-
-// // 1a mudança de estado
-// sub.createMsg(ePriceState.maxOverflow);
-
-// // adicionando um novo ObservadorConcreto
-// // 2a mudança de estado
-// sub.attach(obs2);
-// sub.createMsg(ePriceState.minOverflow);
-
-// // removendo um ObservadorConcreto
-// // 3a mudança de estado
-// sub.detach(obs1);
-// sub.createMsg(ePriceState.maxOverflow);
 

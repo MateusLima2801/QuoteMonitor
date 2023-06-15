@@ -22,8 +22,6 @@ public class EventHandler
 
     public async Task Start()
     {
-        Console.WriteLine("Press any key to stop the loop.\n");
-        //cut that
         while (!token.IsCancellationRequested)
         {
             AssetInfo? info = DataHttpClient.GetAssetInfo(input.assetName).Result;
